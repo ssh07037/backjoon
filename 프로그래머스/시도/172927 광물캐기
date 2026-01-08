@@ -1,0 +1,175 @@
+#include <string>
+#include <tuple>
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+bool check[10];
+
+void Translate(vector<tuple<int, int, int>>& piro, vector<string>& minerals)
+{
+    //5개씩 묶은 후 배열에 넣는다
+    int index = 0;
+    int count = 0;
+    
+    int dia = 0;
+    int irn = 0;
+    int stn = 0;
+    while(index < minerals.size())
+    {
+        count++;
+        if(minerals[index] == "diamond") //미네랄이 다이아라면 각 곡괭이로 캣을때 피로도 더함
+        {
+            dia += 1;
+            irn += 5;
+            stn += 25;
+        }
+        else if(minerals[index] =="iron")
+        {
+            dia += 1;
+            irn += 1;
+            stn += 5;
+        }
+        else
+        {
+             dia += 1;
+            irn += 1;
+            stn += 1;
+        }
+        
+        if(count == 5 || index== minerals.size()-1) //카운트가 5거나 마지막일때 배열에 넣어준다
+        {
+            piro.push_back(make_tuple(dia, irn, stn));
+            dia = 0;
+            irn = 0;
+            stn = 0;
+            count = 0;
+        }
+        index++;
+
+    }
+}
+int Calculation(const string& type , vector<tuple<int, int, int>>& piro ,int& mineSize , int& pickSize)
+{
+    int answer = 0;
+    if(type == "diamond") //미네랄이 다이아라면 각 곡괭이로 캣을때 피로도 더함
+    {
+        for(int i=0; i<pickSize; i++)  //곡괭이 횟수
+        {
+            int min = 200;
+            int index = 0;
+            for(int j=0; j<mineSize; j++) //광산크기
+            {
+                if(check[j] == true) //이미 체크된곳이면 건너띔
+                {
+                    continue;
+                }
+                else if(get<0>(piro[j]) < min) //최솟값 찾기
+                {
+                    min = get<0>(piro[j]);
+                    index = j;
+                }
+            }
+            answer += min; //최솟값만큼 누적합
+            check[index] = true; //캣다고 체크
+            
+        }    
+    }
+    else if(type == "iron")
+    {
+        for(int i=0; i<pickSize; i++)  //곡괭이 횟수
+        {
+            int min = 200;
+            int index = 0;
+            for(int j=0; j<mineSize; j++) //광산크기
+            {
+                if(check[j] == true) //이미 체크된곳이면 건너띔
+                {
+                    continue;
+                }
+                else if(get<1>(piro[j]) < min) //최솟값 찾기
+                {
+                    min = get<1>(piro[j]);
+                    index = j;
+                }
+            }
+            answer += min; //최솟값만큼 누적합
+            check[index] = true; //캣다고 체크
+            
+        }
+    }
+    else
+    {
+        for(int i=0; i<pickSize; i++)  //곡괭이 횟수
+        {
+            int min = 200;
+            int index = 0;
+            for(int j=0; j<mineSize; j++) //광산크기
+            {
+                if(check[j] == true) //이미 체크된곳이면 건너띔
+                {
+                    continue;
+                }
+                else if(get<2>(piro[j]) < min) //최솟값 찾기
+                {
+                    min = get<2>(piro[j]);
+                    index = j;
+                }
+            }
+            answer += min; //최솟값만큼 누적합
+            check[index] = true; //캣다고 체크
+            
+        }
+    }
+    return answer;
+}
+int solution(vector<int> picks, vector<string> minerals) {
+    int answer = 0;
+    vector<tuple<int, int, int>> piro;
+    //1.피로도 표 정리
+    Translate(piro,minerals);
+    
+    //2.광산크기 곡괭이 갯수에 맞춤
+    int mineSize = piro.size();
+    int pickSize = picks[0] + picks[1] + picks[2];
+    if(mineSize > pickSize)
+    {
+        mineSize = pickSize;
+    }
+    cout << mineSize << " 광산 사이즈" << endl;
+    
+    
+    for(int i=mineSize; i>0; i--) //mine size = 2
+    {
+        int count = i;
+        if(count > picks[0]) //다이아곡괭이가 캘 수 있는 양보다 많으면
+        {
+            count -= picks[0];
+            if(count > picks[1]) //철곡괭이가 캘 수 있는 양보다 많으면
+            {
+                //여기서 돌로캐면 마인사이즈 - , picks -
+                answer += Calculation("stone",piro,mineSize,picks[2]);
+                cout << answer << ":stone" << endl;
+            }
+            else
+            {
+                answer += Calculation("iron",piro,mineSize,picks[1]);
+                cout << answer << ":iron " <<mineSize <<" " << picks[1] << endl;
+
+            }
+        }
+        else
+        {
+            answer += Calculation("diamond",piro,mineSize,picks[0]);
+            cout << answer << ":diamond" << endl;
+
+        }
+    }
+  
+    //13개가있고   1 , 1 , 1있다면
+    //3개를 우선 돌에게 양보 , 철 , 다이아가 나머지 캠
+    
+    
+    return answer;
+} //일단 함수가 너무 많아지니까 계산이 오래걸리고 지루하고 현학적이고 잘 작동하지도 않음
