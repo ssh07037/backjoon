@@ -71,6 +71,7 @@ int solution(vector<int> picks, vector<string> minerals) {
     for (int i = 0; i < picks[2] && idx < mines.size(); i++, idx++) {
         answer += mines[idx].stone;
     }
-
+      //킥은 돌곡갱이로 캣을때 가장 손해가 심한것부터 좋은 곡괭이로 캐는것이다
+    //돌이 정렬되면 철 정렬은 따라오는 효과
     return answer;
 }
