@@ -1,0 +1,57 @@
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <iostream>
+using namespace std;
+
+int solution(vector<int> diffs, vector<int> times, long long limit) {
+    int answer = 0;
+    
+    //제한 시간 내에 퍼즐을 모두 해결하기 위한 숙련도의 최솟값
+    
+    //퍼즐이 제한시간내에 다 풀려야함 , 숙련도는 최소
+    
+    //일단 헌번씩 한 사이클을 최소시간이 나올 때 까지 도는게 맞지 않나?
+    //레벨이 1000만 넘어가도 
+    
+    //시간을 줄일 방법을 찾아야한다
+    //못푸는 레벨은 없다
+    
+    long long time = 0;
+    int time_prev = 0;
+    bool bCycle = true;
+    int mintime = 0;
+    int level = *std::min_element(diffs.begin(), diffs.end());    while(bCycle)
+    {
+        level++;
+        time_prev = 0;
+        time = 0;
+        for(int i=0; i<diffs.size(); i++)
+        {
+            
+            if(diffs[i] <= level) //내 요구 레벨보다 쉽다면
+            {
+                //cout << diffs[i] << " 난이도가 " << level << " 내 숙련도보다 낮음" << time << " -> " <<  time + times[i] << endl;
+
+                time += times[i];
+            }
+            else if(diffs[i] > level) //내 레벨보다 어렵다면
+            {
+                 //cout << diffs[i] << " 난이도가 " << level << " 내 숙련도보다 높음 " << time << " -> " <<  time + (diffs[i] - level) * (time_prev + times[i]) + times[i]<< endl;         
+                time += (diffs[i] - level) * (time_prev + times[i]) + times[i];
+            }
+            time_prev = times[i];
+                
+        }
+        
+        if(time <= limit)
+        {
+            answer= level;
+            bCycle = false;
+        }
+        
+   }
+    
+    return answer;
+    //while{for()}}이라 시도횟수가 사실상 o(n^2)과 마찬가지라 효율성에서 떨어짐
+}
