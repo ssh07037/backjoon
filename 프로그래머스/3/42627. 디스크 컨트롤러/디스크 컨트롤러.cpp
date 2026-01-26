@@ -1,45 +1,48 @@
+#include <string>
 #include <vector>
-#include <queue>
 #include <algorithm>
+#include <iostream>
+#include <queue>
 
 using namespace std;
-
 struct compare {
-    bool operator()(const vector<int>& a, const vector<int>& b) {
-        if (a[1] != b[1]) 
-            return a[1] > b[1]; // 소요시간 짧은 순
-        return a[0] > b[0];                  // 요청시각 빠른 순
+    bool operator()(const vector<int>& a, const vector<int>& b) const {
+        if (a[1] != b[1]) return a[1] > b[1]; // 소요시간 짧은 게 우선
+        return a[0] > b[0];                  // 요청 시각 빠른 게 우선
     }
 };
 
 int solution(vector<vector<int>> jobs) {
-    sort(jobs.begin(), jobs.end()); // 요청 시각 기준 정렬
+    int answer = 0;
+
+    sort(jobs.begin(), jobs.end());
 
     priority_queue<vector<int>, vector<vector<int>>, compare> pq;
 
-    int time = 0;
     int index = 0;
-    int total = 0;
-    int n = jobs.size();
-
-    while (index < n || !pq.empty()) {
-        while (index < n && jobs[index][0] <= time) {
+    int current_time = 0;
+    int sum = 0;
+    while (index < jobs.size() || !pq.empty())
+    {
+        while ( index < jobs.size() && jobs[index][0] <= current_time) //지금시간에 들어올 수 있는 작업 모두 넣음
+        {
             pq.push(jobs[index]);
             index++;
-            //현재 시간보다 적은 시작시간을 전부 pq에 넣음
         }
-
-        if (pq.empty()) {
-            // 아직 도착한 작업이 없으면 시간 점프
-            time = jobs[index][0];
-        } else {
-            auto cur = pq.top();
+       
+        if (!pq.empty())
+        {
+            vector<int>temp = pq.top();
             pq.pop();
-
-            time += cur[1];
-            total += time - cur[0]; // 반환 시간
+            current_time += temp[1];
+            sum += current_time - temp[0];
+        }
+        else
+        {
+            current_time++;
         }
     }
 
-    return total / n;
+    answer = sum / jobs.size();
+    return answer;
 }
