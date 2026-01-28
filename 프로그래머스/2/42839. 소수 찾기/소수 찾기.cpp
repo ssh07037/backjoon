@@ -1,65 +1,53 @@
 #include <string>
 #include <vector>
-#include<iostream>
-#include <string>
+#include <iostream>
 #include <set>
-
 using namespace std;
-vector<int>sosu(10000000 ,0);
-vector<int>number;
-set<int> s;
-void start(int count , vector<bool>used , string numbers)
+
+bool check[7];
+string temp;
+void dfs(const string& numbers,vector<string>& vs)
 {
-    if(count == numbers.size()) //number = 1 , 7
+    for(int i=0; i<numbers.size(); i++)
     {
-        int ans = 0;
-        for(int i=0; i<numbers.size(); i++)
-        {
-           ans = ans * 10 + number[i];
-           // cout << ans << endl;
-           if(sosu[ans] == 0) //소수면
-           {
-               s.insert(ans);
-           }
-            
-        }
-        //cout << "--------" << endl;
-        return;
-    }
-    for(int i=0; i<numbers.size(); i++)  //[0],0[1],01[2] 포문끝 -> [0],0[2],02[1]
-    {
-        if(used[i] == false) //중복방지
-        {
-            number[count] = numbers[i]-'0'; //number[0] = 1  number[1] = 7 
-            used[i] = true;             //used[0] = true , used[1] = true
-            count++;
-            start(count,used,numbers); //
-            used[i] = false; //포문이 다 진행되고 뒤로갈 때 반납
-            count--;
-        }  
+        if(check[i] == true)
+            continue;
+        check[i] = true;
+        temp+=numbers[i];
+        vs.push_back(temp);
+        dfs(numbers,vs);
+        //-----------------
+        temp.pop_back();
+        check[i] = false;
     }
 }
-//0 - 1 - 2
-//0 - 1
-//0 - 2 - 1
-int solution(string numbers) {
-    number.resize(numbers.size(), -1);
-    vector<bool>used(numbers.size(),false);
 
+
+int solution(string numbers) {
     int answer = 0;
-    sosu[0] = 1;
-    sosu[1] = 1;
-    for(int i=2; i<=10000000; i++)
+    vector<string>vs;
+    dfs(numbers,vs);
+    
+    set<int>s;
+    for(int i=0; i<vs.size(); i++)
     {
-        for(int j=i*2; j<=10000000; j=j+i)
+        int number = stoi(vs[i]);
+        bool sosu = true;
+        if(number == 1 || number == 0)
+            continue;
+        for(int i=2; i<number; i++)
         {
-            sosu[j] = 1;
+            if(number % i == 0)
+            {
+                sosu = false;
+                break;
+            }
+        }
+        if(sosu == true)
+        {
+             s.insert(number); 
         }
     }
-    start(0 , used, numbers);
     answer = s.size();
-    //cout << sosu[7] << endl;
-    //sosu 백터에 소수인 숫자만 1 적용
-    
     return answer;
 }
