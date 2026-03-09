@@ -1,47 +1,54 @@
 #include <string>
 #include <vector>
 #include <set>
-#include <iostream>
+
 using namespace std;
 
-int solution(vector<vector<string>> relation) {
-    int answer = 0;
+int solution(vector<vector<string>> relation) 
+{
     int row = relation.size();
     int col = relation[0].size();
-    //cout << row << " " << col << endl;
-    vector<int>keys;
-    for(int mask = 1; mask < (1<<col); mask++)
+    
+    vector<int> candidate;
+    
+    for(int mask = 1; mask < (1 << col); mask++)
     {
-        bool next = false;
-        for(auto a : keys)
+        // 최소성 검사
+        bool minimal = true;
+        for(int key : candidate)
         {
-            if((mask & a) == a)
+            if((key & mask) == key)
             {
-                next = true;
+                minimal = false;
                 break;
             }
         }
-        if(next == true)
-            continue;
         
-        set<string>s;
-        for(int i=0; i<row; i++)
+        if(!minimal) continue;
+        
+        // 유일성 검사
+        set<string> s;
+        
+        for(int r = 0; r < row; r++)
         {
-            string temp="";
-            for(int j=0; j<col; j++)
+            string temp = "";
+            
+            for(int c = 0; c < col; c++)
             {
-                if(mask & (1<<j))
+                if(mask & (1 << c))
                 {
-                    temp += relation[i][j];
+                    temp += relation[r][c];
                 }
             }
-            //cout << temp << endl;
+            
             s.insert(temp);
         }
+        
         if(s.size() == row)
         {
-            keys.push_back(mask);
+            candidate.push_back(mask);
         }
-    }   
-    return answer = keys.size();
+    }
+    
+    return candidate.size();
 }
